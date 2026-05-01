@@ -24,6 +24,13 @@
       --sparkle-scale-max: 1.26;
     }
 
+    body {
+      overflow-x: hidden;
+      overflow-y: auto;
+      min-height: 100svh;
+      -webkit-overflow-scrolling: touch;
+    }
+
     /* doi class body thanh sparkle-soft neu muon ban diu mat hon */
     body.sparkle-rich {
       --sparkle-opacity: 0.95;
@@ -69,6 +76,12 @@
       text-align: center;
       margin-top: 70px;
     }
+      .flowers {
+        position: relative;
+        z-index: 30;
+        transform: scale(0.9);
+        transform-origin: bottom center;
+      }
 
     @keyframes glow {
       from {
@@ -127,6 +140,7 @@
 
     .floating-images {
       width: min(34vw, 420px);
+      z-index: 10;
     }
 
     .floating-images .floating-circle {
@@ -134,13 +148,13 @@
       --delay: 0s;
       --x-drift: 14px;
       --scale: 1;
-      width: clamp(80px, 12vmin, 150px);
-      height: clamp(80px, 12vmin, 150px);
-      border: 3px solid rgba(255, 225, 241, 0.9);
+      width: clamp(56px, 9vmin, 120px);
+      height: clamp(56px, 9vmin, 120px);
+      border: 2px solid rgba(255, 225, 241, 0.9);
       box-shadow:
-        0 10px 22px rgba(255, 170, 214, 0.35),
-        0 0 20px rgba(255, 186, 219, 0.45),
-        inset 0 0 14px rgba(255, 255, 255, 0.45);
+        0 8px 18px rgba(255, 170, 214, 0.26),
+        0 0 16px rgba(255, 186, 219, 0.34),
+        inset 0 0 12px rgba(255, 255, 255, 0.42);
       animation:
         bubble-rise var(--dur) ease-in-out infinite var(--delay),
         bubble-wobble calc(var(--dur) * 0.6) ease-in-out infinite var(--delay);
@@ -161,24 +175,6 @@
       height: 100%;
       object-fit: cover;
       border-radius: 50%;
-      display: block;
-      pointer-events: none;
-    }
-
-    .floating-images .floating-circle::before {
-      content: "";
-      position: absolute;
-      width: var(--sparkle-dot-size);
-      height: var(--sparkle-dot-size);
-      left: 18%;
-      top: 22%;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(255, 244, 252, 0.85) 45%, rgba(255, 244, 252, 0) 100%);
-      box-shadow: var(--sparkle-shadows);
-      filter: drop-shadow(var(--sparkle-glow));
-      opacity: var(--sparkle-opacity);
-      pointer-events: none;
-      animation: bubble-sparkle var(--sparkle-duration) ease-in-out infinite;
     }
 
     .floating-images .floating-circle:nth-child(odd)::before {
@@ -259,22 +255,51 @@
 
     @media (max-width: 768px) {
       .floating-images {
-        width: min(36vw, 300px);
+          width: min(30vw, 240px);
       }
 
       .floating-images .floating-circle {
-        width: clamp(80px, 12vmin, 140px);
-        height: clamp(80px, 12vmin, 140px);
+          width: clamp(50px, 8vmin, 96px);
+          height: clamp(50px, 8vmin, 96px);
       }
 
       .floating-images--left {
-        left: 4vw;
+          left: 2vw;
       }
 
       .floating-images--right {
-        right: 4vw;
+          right: 2vw;
+        }
+
+        .flowers {
+          transform: scale(0.76) translateY(4vh);
+        }
+
+        .love-text {
+          font-size: 28px;
+          top: 28px;
       }
     }
+
+      @media (max-width: 480px) {
+        .floating-images {
+          width: min(28vw, 180px);
+        }
+
+        .floating-images .floating-circle {
+          width: clamp(44px, 8vmin, 80px);
+          height: clamp(44px, 8vmin, 80px);
+        }
+
+        .flowers {
+          transform: scale(0.64) translateY(5vh);
+        }
+
+        .love-text {
+          font-size: 22px;
+          top: 22px;
+        }
+      }
   </style>
 </head>
 
@@ -716,26 +741,42 @@
       }
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      bgmFlores.addEventListener('loadedmetadata', restoreMusicTime, { once: true });
-      bgmFlores.addEventListener('timeupdate', saveMusicTime);
-      unlockMusicOnFirstGesture();
+    // Gắn event listener trước
+    bgmFlores.addEventListener('loadedmetadata', () => {
+      restoreMusicTime();
       tryPlayMusic();
-      const autoplayRetry = setInterval(() => {
-        const musicEnabled = getMusicEnabled();
-        if (bgmFlores.paused && musicEnabled) {
-          tryPlayMusic();
-        } else {
-          clearInterval(autoplayRetry);
-        }
-      }, 800);
+    }, { once: true });
+    bgmFlores.addEventListener('timeupdate', saveMusicTime);
+    bgmFlores.addEventListener('canplay', () => {});
 
+    // Nếu metadata đã sẵn sàng (readyState >= 2), khôi phục rồi phát ngay
+    if (bgmFlores.readyState >= 2) {
+      restoreMusicTime();
+      tryPlayMusic();
+    } else {
+      // Chưa sẵn sàng, lệch phát lại để đợi listener có cơ hội khôi phục
       setTimeout(() => {
-        clearInterval(autoplayRetry);
-      }, 8000);
-    });
+        if (bgmFlores.readyState >= 2 && getMusicEnabled()) {
+          tryPlayMusic();
+        }
+      }, 100);
+    }
 
-    bgmFlores.addEventListener('canplay', tryPlayMusic);
+    unlockMusicOnFirstGesture();
+
+    // Retry autoplay nếu nhạc bị pause
+    const autoplayRetry = setInterval(() => {
+      const musicEnabled = getMusicEnabled();
+      if (bgmFlores.paused && musicEnabled) {
+        tryPlayMusic();
+      } else {
+        clearInterval(autoplayRetry);
+      }
+    }, 800);
+
+    setTimeout(() => {
+      clearInterval(autoplayRetry);
+    }, 8000);
 
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {

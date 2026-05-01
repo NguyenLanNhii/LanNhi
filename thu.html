@@ -29,16 +29,29 @@
             height: 50%;
         }
 
-        * {
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
+        }
+
+        body {
+            overflow-x: hidden;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        body.body-lock-scroll {
+            overflow: hidden;
         }
 
         .body-letter {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100svh;
             background: radial-gradient(circle at top, #ffe7f1 0%, #ffd8e8 45%, #ffd0df 100%);
         }
 
@@ -54,17 +67,19 @@
             animation: up 3s linear infinite;
             width: 360px;
             height: 320px;
+            --val-scale: 1;
+            transform-origin: top center;
         }
 
         @keyframes up {
 
             0%,
             100% {
-                transform: translateY(0);
+                transform: translateY(0) scale(var(--val-scale));
             }
 
             50% {
-                transform: translateY(-30px);
+                transform: translateY(-30px) scale(var(--val-scale));
             }
         }
 
@@ -328,7 +343,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100svh;
             background:
                 radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.65) 0 120px, transparent 121px),
                 radial-gradient(circle at 88% 15%, rgba(255, 255, 255, 0.55) 0 95px, transparent 96px),
@@ -439,23 +454,30 @@
         }
 
         .wrapperLetterForm {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100dvh;
             z-index: 1000;
             background: rgba(94, 39, 66, 0.45);
             backdrop-filter: blur(4px);
             display: none;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            padding: 10px 0 16px;
         }
 
         .boxLetter {
             width: 100%;
-            height: 100%;
+            max-width: 100%;
+            min-height: 100%;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            justify-content: flex-start;
             align-items: center;
+            gap: 12px;
+            position: relative;
         }
 
         .boxLetter .formLetter {
@@ -468,6 +490,8 @@
             padding: 24px 20px;
             border: 1px solid #ffd5e8;
             box-shadow: 0 20px 45px rgba(173, 77, 120, 0.25);
+            flex-shrink: 0;
+            max-width: 100%;
         }
 
         .formLetter .wrapperLetter {
@@ -639,30 +663,6 @@
             margin-top: 10px;
         }
 
-        .contentLetterPage1 {
-            transform: rotateY(0deg);
-            opacity: 1;
-            z-index: 2;
-        }
-
-        .contentLetterPage2 {
-            transform: rotateY(180deg);
-            opacity: 0;
-            z-index: 1;
-        }
-
-        .textLetter.page2 .contentLetterPage1 {
-            transform: rotateY(-180deg);
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .textLetter.page2 .contentLetterPage2 {
-            transform: rotateY(0deg);
-            opacity: 1;
-            z-index: 3;
-        }
-
         .letterPages {
             width: 100%;
             display: flex;
@@ -695,12 +695,13 @@
         @media (max-width: 900px) {
             .boxLetter .formLetter {
                 height: auto;
-                max-height: 90vh;
+                max-height: none;
+                min-height: auto;
             }
 
             .formLetter .wrapperLetter {
                 flex-direction: column;
-                overflow-y: auto;
+                overflow: visible;
             }
 
             .memoryBook,
@@ -713,13 +714,60 @@
             }
 
             .textLetter .contentLetter {
-                max-height: 38vh;
+                font-size: 19px;
+                text-align: center;
+                line-height: 1.7;
+                /* dễ đọc */
+                font-family: 'Dancing Script', cursive;
+                color: #8b4b6f;
+                word-break: break-word;
+                overflow-wrap: anywhere;
+                white-space: pre-wrap;
+
+                position: relative;
+                /* bỏ hiệu ứng lật trang */
+                width: 100%;
+                height: auto;
+                margin: 0;
+                padding: 18px 20px;
+                box-sizing: border-box;
+                border-radius: 14px;
+                border: 1px solid #ffd4e8;
+                background: linear-gradient(180deg, #fffdfd 0%, #ffeff8 100%);
+                box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+                overflow: visible;
+                -webkit-overflow-scrolling: touch;
             }
 
             .letterViewport {
+                position: relative;
                 width: 100%;
-                height: min(38vh, 290px);
-                min-height: 220px;
+                min-height: 0;
+                height: auto;
+                margin-top: 10px;
+                display: block;
+            }
+
+            .body-letter {
+                align-items: center;
+                padding: 12px 0;
+            }
+
+            #castle {
+                align-items: center;
+                padding: 10px 0;
+            }
+
+            .valentines {
+                top: 22px;
+                --val-scale: 0.86;
+            }
+
+            .shadow {
+                top: 274px;
+                left: 38px;
+                width: 244px;
+                height: 24px;
             }
         }
 
@@ -768,10 +816,7 @@
         }
 
         .nextPageBtn {
-            position: absolute;
-            bottom: 18px;
-            left: 50%;
-            transform: translateX(-50%);
+            position: static;
             min-width: 170px;
             height: 56px;
             padding: 0 28px;
@@ -779,27 +824,40 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            background: linear-gradient(180deg, rgba(255,230,243,1), rgba(255,210,236,1));
+            margin: 14px auto 0;
+            align-self: center;
+            background: linear-gradient(180deg, rgba(255, 230, 243, 1), rgba(255, 210, 236, 1));
             border-radius: 999px;
-            border: 1px solid rgba(255,255,255,0.6);
-            box-shadow: 0 10px 30px rgba(225,105,165,0.12), inset 0 1px 0 rgba(255,255,255,0.7);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 10px 30px rgba(225, 105, 165, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.7);
             font-family: 'Dancing Script', cursive;
             font-size: 26px;
             color: #fff;
             text-decoration: none;
-            transition: transform .25s ease, box-shadow .25s ease;
+            transition: transform .25s ease, box-shadow .25s ease, opacity .35s ease;
             backdrop-filter: blur(6px) saturate(120%);
             overflow: hidden;
             z-index: 15;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateY(12px);
+        }
+
+        .nextPageBtn.is-visible {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateY(0);
         }
 
         .nextPageBtn:hover {
-            transform: translateX(-50%) translateY(-6px);
-            box-shadow: 0 22px 48px rgba(225,105,165,0.18);
+            transform: translateY(-6px);
+            box-shadow: 0 22px 48px rgba(225, 105, 165, 0.18);
         }
 
         .nextPageBtn:active {
-            transform: translateX(-50%) translateY(-2px) scale(.98);
+            transform: translateY(-2px) scale(.98);
         }
 
         .nextPageBtn::after {
@@ -808,7 +866,7 @@
             right: 12px;
             width: 10px;
             height: 10px;
-            background: radial-gradient(circle, rgba(255,255,255,0.9), rgba(255,255,255,0.2));
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.2));
             border-radius: 50%;
             filter: blur(6px);
             opacity: 0;
@@ -816,7 +874,10 @@
             transform: translateY(-6px) scale(.85);
         }
 
-        .nextPageBtn:hover::after { opacity: 1; transform: translateY(-8px) scale(1.05); }
+        .nextPageBtn:hover::after {
+            opacity: 1;
+            transform: translateY(-8px) scale(1.05);
+        }
 
         .nextPageBtn .btnEmoji {
             font-size: 26px;
@@ -827,24 +888,75 @@
         }
 
         @keyframes softPulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.06); }
-            100% { transform: scale(1); }
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.06);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
 
-        .nextPageBtn .btnText { font-size: 24px; color: #fff; text-shadow: 0 4px 14px rgba(255,255,255,0.18); }
+        .nextPageBtn .btnText {
+            font-size: 24px;
+            color: #fff;
+            text-shadow: 0 4px 14px rgba(255, 255, 255, 0.18);
+        }
 
         @media (max-width: 480px) {
+            body {
+                overflow-x: hidden;
+                overflow-y: auto;
+            }
+
+            .wrapperLetterForm {
+                padding: 0;
+            }
+
+            .boxLetter {
+                align-items: stretch;
+                gap: 8px;
+            }
+
+            .body-letter {
+                align-items: center;
+                padding: 10px 0;
+            }
+
+            #castle {
+                align-items: center;
+                padding: 8px 0;
+            }
+
+            .valentines {
+                top: 18px;
+                --val-scale: 0.74;
+            }
+
+            .shadow {
+                top: 262px;
+                left: 46px;
+                width: 214px;
+                height: 20px;
+            }
+
             .boxLetter .formLetter {
-                width: 92vw;
+                width: 100%;
                 height: auto;
-                max-height: 85vh;
+                max-height: none;
+                min-height: auto;
+                border-radius: 0;
+                padding: 14px 10px 18px;
             }
 
             .formLetter .wrapperLetter {
                 gap: 14px;
-                padding: 12px;
-                overflow-y: auto;
+                padding: 10px;
+                overflow: visible;
             }
 
             .memoryBook {
@@ -860,7 +972,9 @@
             }
 
             .textLetter {
-                padding: 6px 4px;
+                width: 100%;
+                padding: 4px 0;
+                align-items: stretch;
             }
 
             .textLetter h2 {
@@ -869,15 +983,20 @@
 
             .textLetter .contentLetter {
                 font-size: 16px;
+                text-align: center;
                 max-height: none;
-                overflow-y: auto;
+                height: auto;
+                overflow: visible;
                 -webkit-overflow-scrolling: touch;
                 padding: 12px;
+                width: 100%;
+                box-sizing: border-box;
             }
 
             .letterViewport {
-                height: min(42vh, 300px);
-                min-height: 200px;
+                width: 100%;
+                height: auto;
+                min-height: 0;
             }
 
             .letterPages {
@@ -895,16 +1014,43 @@
                 margin: 8px auto 0;
             }
 
+            .textLetter .heartAnimation,
+            .wrapperLetter>.heartAnimation {
+                display: none;
+            }
+
             .signature {
                 right: 12px;
                 bottom: 8px;
                 font-size: 16px;
             }
 
-            .nextPageBtn { min-width: 140px; height: 48px; padding: 0 16px; bottom: 12px; }
-            .nextPageBtn .btnEmoji { font-size: 20px; }
-            .nextPageBtn .btnText { font-size: 20px; }
-            .nextPageBtn::after { right: 10px; }
+            .nextPageBtn {
+                min-width: 140px;
+                height: 48px;
+                padding: 0 16px;
+                margin-top: 12px;
+            }
+
+            .nextPageBtn .btnEmoji {
+                font-size: 20px;
+            }
+
+            .nextPageBtn .btnText {
+                font-size: 20px;
+            }
+
+            .nextPageBtn::after {
+                right: 10px;
+            }
+        }
+
+        .wrapperLetterForm {
+            z-index: 1000;
+        }
+
+        .nextPageBtn {
+            z-index: 1001;
         }
     </style>
 </head>
@@ -949,35 +1095,34 @@
                             <img src="./image/love/7.jpg" alt="Ky niem 3">
                             <img src="./image/love/19.JPG" alt="Ky niem 4">
                         </div>
-                        <p class="bookNote">Mỗi tấm hình là một khoảnh khắc đáng nhớ</p>
+
                     </div>
                     <div class="textLetter">
                         <h2></h2>
                         <div class="letterViewport">
-                            <p class="contentLetter contentLetterPage1"></p>
-                            <p class="contentLetter contentLetterPage2"></p>
-                        </div>
-                        <div class="letterPages">
-                            <button type="button" class="letterPageBtn active" data-page="1">Trang 1</button>
-                            <button type="button" class="letterPageBtn" data-page="2">Trang 2</button>
+                            <p class="contentLetter"></p>
                         </div>
                         <div class="heartAnimation">
                             <img src="./image/heartAnimation.gif" alt="">
                         </div>
                     </div>
-                    <div class="mewmew1">
-                        <img src="./image/mewmew.gif" alt="">
-                    </div>
-                    <div class="mewmew2">
-                        <img src="./image/mewmew.gif" alt="">
+                    <div class="heartAnimation">
+                        <img src="./image/heartAnimation.gif" alt="">
                     </div>
                 </div>
-                <a class="nextPageBtn" title="Xem thêm" href="./Flores_NilverTI/FLORES.html" aria-label="Tiếp nè">
-                    <span class="btnEmoji" aria-hidden="true">👉</span>
-                    <span class="btnText"></span>
-                </a>
+                <div class="mewmew1">
+                    <img src="./image/mewmew.gif" alt="">
+                </div>
+                <div class="mewmew2">
+                    <img src="./image/mewmew.gif" alt="">
+                </div>
             </div>
+            <a class="nextPageBtn" title="Xem thêm" href="./Flores_NilverTI/FLORES.html" aria-label="Tiếp nè">
+                <span class="btnEmoji" aria-hidden="true">👉</span>
+                <span class="btnText"></span>
+            </a>
         </div>
+    </div>
     </div>
 
     <audio id="bgm" src="./mucsic/Bản sao Happy Birthday To You.mp3" preload="auto" loop playsinline></audio>
@@ -1013,14 +1158,30 @@
         }
 
         let indexTextContent = 0;
-        let textLetterContent = document.querySelector('.contentLetterPage1');
-        let textLetterContentPage2 = document.querySelector('.contentLetterPage2');
+        let textLetterContent = document.querySelector('.contentLetter');
+        const nextPageBtn = document.querySelector('.nextPageBtn');
+
         const textLetterP = `Chúc mừng sinh nhật mày 🎂
-Vậy là tụi mình đã đi cùng nhau 11 năm rồi, nghe thì thấy dài mà nghĩ lại vẫn thấy mọi thứ trôi qua nhanh thật. Từ những ngày còn vô tư, cho tới bây giờ mỗi đứa đều có những suy nghĩ, hướng đi riêng, nhưng vẫn còn giữ được nhau như này là điều tao thấy rất đáng trân trọng.Tao không giỏi nói mấy lời hoa mỹ, nên chỉ mong những điều đơn giản thôi. Mong mày luôn vui vẻ, sống ổn định và cảm thấy thoải mái với cuộc sống mà mày đang chọn. Có những lúc vui thì cứ tận hưởng hết mình, còn những lúc không ổn thì cũng đừng ngại, cứ nói với tao — tao vẫn ở đây, như cách tụi mình vẫn luôn ở cạnh nhau suốt bao nhiêu năm qua. Cảm ơn mày vì đã luôn là một phần rất quan trọng trong cuộc sống của tao. Từ những chuyện nhỏ nhặt nhất cho tới những lúc thật sự khó khăn, mày chưa từng rời đi. Tình bạn của tụi mình không cần phải lúc nào cũng ồn ào hay thể hiện quá nhiều, nhưng vẫn luôn hiểu nhau, vẫn luôn có một chỗ dành cho nhau như vậy là đủ rồi. Tuổi mới rồi, cứ sống theo cách mày muốn, làm những điều khiến mày cảm thấy hạnh phúc. Đừng suy nghĩ quá nhiều, đừng tự tạo áp lực cho bản thân quá lớn. Mong là những chặng đường phía trước của mày sẽ nhẹ nhàng hơn, nhiều niềm vui hơn và gặp được thật nhiều điều tốt đẹp. Và dù sau này có bận rộn thế nào, mỗi đứa có thể đi những con đường khác nhau, thì chỉ cần tụi mình vẫn còn giữ liên lạc, vẫn còn nhớ đến nhau vậy là ổn rồi.
+Vậy là tụi mình đã đi cùng nhau 11 năm rồi, nghe thì thấy dài mà nghĩ lại vẫn thấy mọi thứ trôi qua nhanh thật. Từ những ngày còn vô tư, cho tới bây giờ mỗi đứa đều có những suy nghĩ, hướng đi riêng, nhưng vẫn còn giữ được nhau như này là điều tao thấy rất đáng trân trọng. Tao không giỏi nói mấy lời hoa mỹ, nên chỉ mong những điều đơn giản thôi. Mong mày luôn vui vẻ, sống ổn định và cảm thấy thoải mái với cuộc sống mà mày đang chọn. Có những lúc vui thì cứ tận hưởng hết mình, còn những lúc không ổn thì cũng đừng ngại, cứ nói với tao — tao vẫn ở đây, như cách tụi mình vẫn luôn ở cạnh nhau suốt bao nhiêu năm qua. Cảm ơn mày vì đã luôn là một phần rất quan trọng trong cuộc sống của tao. Từ những chuyện nhỏ nhặt nhất cho tới những lúc thật sự khó khăn, mày chưa từng rời đi. Tình bạn của tụi mình không cần phải lúc nào cũng ồn ào hay thể hiện quá nhiều, nhưng vẫn luôn hiểu nhau, vẫn luôn có một chỗ dành cho nhau như vậy là đủ rồi.
+Tuổi mới rồi, cứ sống theo cách mày muốn, làm những điều khiến mày cảm thấy hạnh phúc. Đừng suy nghĩ quá nhiều, đừng tự tạo áp lực cho bản thân quá lớn. Mong là những chặng đường phía trước của mày sẽ nhẹ nhàng hơn, nhiều niềm vui hơn và gặp được thật nhiều điều tốt đẹp. Và dù sau này có bận rộn thế nào, mỗi đứa có thể đi những con đường khác nhau, thì chỉ cần tụi mình vẫn còn giữ liên lạc, vẫn còn nhớ đến nhau vậy là ổn rồi.
+Dù thời gian có trôi nhanh đến đâu, mong rằng tình bạn này vẫn luôn là một nơi an toàn nơi mà tụi mình có thể quay về, kể nhau nghe mọi chuyện, dù là vui hay buồn, dù là những điều nhỏ bé nhất. Không cần phải hoàn hảo, không cần phải cố gắng trở thành ai khác, chỉ cần là chính mình thôi cũng đủ.
+Cảm ơn vì đã xuất hiện trong thanh xuân của tao theo một cách rất đặc biệt. Không ồn ào nhưng lại bền bỉ, không quá phô trương nhưng lại sâu sắc. Những ký ức tụi mình có với nhau, tao nghĩ sau này nhớ lại vẫn sẽ thấy rất ấm. Mong là sau này, khi mỗi đứa trưởng thành hơn, có nhiều trách nhiệm hơn, thì tình bạn này vẫn không thay đổi vẫn là nơi để tụi mình dựa vào khi cần, và là nơi khiến mình cảm thấy yên tâm khi nghĩ đến. Chúc mày luôn bình an, vững vàng và hạnh phúc với những gì mày chọn. Và hy vọng rằng, trong một khoảnh khắc đẹp nào đó của tương lai, tụi mình vẫn ngồi lại với nhau, nói chuyện như chưa từng có khoảng cách nào xảy ra.
+
 Chúc mày có một ngày sinh nhật thật vui, thật trọn vẹn 🎉`;
-        const textLetterP2 = `Dù thời gian có trôi nhanh đến đâu, mong rằng tình bạn này vẫn luôn là một nơi an toàn nơi mà tụi mình có thể quay về, kể nhau nghe mọi chuyện, dù là vui hay buồn, dù là những điều nhỏ bé nhất. Không cần phải hoàn hảo, không cần phải cố gắng trở thành ai khác, chỉ cần là chính mình thôi cũng đủ.
-Cảm ơn vì đã xuất hiện trong thanh xuân của tao theo một cách rất đặc biệt. Không ồn ào nhưng lại bền bỉ, không quá phô trương nhưng lại sâu sắc. Những ký ức tụi mình có với nhau, tao nghĩ sau này nhớ lại vẫn sẽ thấy rất ấm. Mong là sau này, khi mỗi đứa trưởng thành hơn, có nhiều trách nhiệm hơn, thì tình bạn này vẫn không thay đổi vẫn là nơi để tụi mình dựa vào khi cần, và là nơi khiến mình cảm thấy yên tâm khi nghĩ đến. Chúc mày luôn bình an, vững vàng và hạnh phúc với những gì mày chọn. Và hy vọng rằng, trong một khoảnh khắc đẹp nào đó của tương lai, tụi mình vẫn ngồi lại với nhau, nói chuyện như chưa từng có khoảng cách nào xảy ra.`;
+
         let timoutTextLetterContent;
+
+        function hideNextPageButton() {
+            if (nextPageBtn) {
+                nextPageBtn.classList.remove('is-visible');
+            }
+        }
+
+        function showNextPageButton() {
+            if (nextPageBtn) {
+                nextPageBtn.classList.add('is-visible');
+            }
+        }
 
         function showLetterPage(pageNumber) {
             const pageButtons = document.querySelectorAll('.letterPageBtn');
@@ -1042,19 +1203,19 @@ Cảm ơn vì đã xuất hiện trong thanh xuân của tao theo một cách r�
             if (indexTextContent < textLetterP.length) {
                 textLetterContent.textContent += textLetterP[indexTextContent];
                 indexTextContent++;
-                setTimeout(textCharLetterContent, 2500);
+                timoutTextLetterContent = setTimeout(textCharLetterContent, 22);
             } else {
-                clearInterval(timoutTextLetterContent);
+                clearTimeout(timoutTextLetterContent);
+                showNextPageButton();
             }
         }
 
         function funcTimeoutLetterContent() {
             indexTextContent = 0;
+            clearTimeout(timoutTextLetterContent);
+            hideNextPageButton();
             textLetterContent.textContent = '';
-            clearInterval(timoutTextLetterContent);
-            timoutTextLetterContent = setInterval(() => {
-                textCharLetterContent();
-            }, 100);
+            textCharLetterContent();
         }
 
         const bgm = document.getElementById('bgm');
@@ -1121,6 +1282,11 @@ Cảm ơn vì đã xuất hiện trong thanh xuân của tao theo một cách r�
             bgm.addEventListener('loadedmetadata', restoreMusicTime, { once: true });
             bgm.addEventListener('timeupdate', saveMusicTime);
             bgm.addEventListener('canplay', tryPlayMusic);
+
+            // Nếu metadata đã sẵn sàng, khôi phục ngay; không thì đợi loadedmetadata event
+            if (bgm.readyState >= 2) {
+                restoreMusicTime();
+            }
         }
 
         document.addEventListener('visibilitychange', () => {
@@ -1158,6 +1324,8 @@ Cảm ơn vì đã xuất hiện trong thanh xuân của tao theo một cách r�
 
             $('.card').click(function () {
                 $('.wrapperLetterForm').fadeIn();
+                $('body').addClass('body-lock-scroll');
+                hideNextPageButton();
                 funcTimeoutLetter();
                 showLetterPage(1);
                 tryPlayMusic();
@@ -1165,6 +1333,8 @@ Cảm ơn vì đã xuất hiện trong thanh xuân của tao theo một cách r�
 
             $('.fa-xmark').click(function () {
                 $('.wrapperLetterForm').css('display', 'none');
+                $('body').removeClass('body-lock-scroll');
+                hideNextPageButton();
                 showLetterPage(1);
             });
 
